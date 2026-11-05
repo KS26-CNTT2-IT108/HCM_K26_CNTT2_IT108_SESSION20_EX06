@@ -1,0 +1,42 @@
+SESSION20
+Bài 6 : Ngăn chặn rò rỉ thông tin bí mật trên GitHub
+
+Tên lớp: HCM K26 CNTT2
+Môn học: Nhập môn công nghệ thông tin
+Họ và tên: LƯƠNG THANH THƯ
+
+Câu 1: Repository mẫu chứa cấu trúc file an toàn
+Lop_MonHoc_Session19_Ex06/
+	 .gitignore
+	 .env.example
+	 .env.development.example
+	 .env.test.example
+	 .env.production.example
+	 README.md          (checklist + hướng dẫn 2FA)
+	 RISK_REPORT.md     (báo cáo rủi ro)
+	 src/
+.gitignore: bỏ qua .env, .env.*, *.pem, *.key, node_modules/, dist/; cho phép !.env.example và !.env.*.example.
+.env.example: chỉ ghi tên biến và giá trị giả, chia 3 môi trường:
+Dev: key thử nghiệm (sk_test_...), database cục bộ.
+Test: database test riêng, key thử nghiệm.
+Production: để trống, key thật nằm trong GitHub Secrets.
+
+Câu 2: Pre-push Checklist (quét API Keys hardcode)
+	Tìm key trong code: git grep -nEi "api[_-]?key|secret|token|password".
+	Chuyển mọi key sang biến môi trường.
+	Chắc chắn .env nằm trong .gitignore.
+	Quét cả lịch sử commit bằng gitleaks hoặc git-secrets.
+	Bật Secret Scanning và Push Protection trên GitHub.
+	Nếu từng lộ key: thu hồi và tạo key mới.
+
+Câu 3: Bật 2FA bắt buộc cho team
+	Mỗi thành viên bật 2FA bằng app Authenticator, lưu recovery codes.
+	Chủ tổ chức bật: Organization > Settings > Authentication security > Require two-factor authentication.
+	Người chưa bật 2FA bị loại khỏi tổ chức cho đến khi bật xong.
+
+Báo cáo rủi ro nếu thiếu .gitignore
+Lộ file .env: git add . đẩy key thật lên Public (rất cao).
+Bot quét key: key bị lấy trong vài phút (rất cao).
+Thiệt hại tiền bạc và dữ liệu khách hàng: lạm dụng key Stripe, AWS, database (cao).
+Khó khắc phục: xóa file vẫn còn trong lịch sử Git, phải revoke key (cao).
+Repo nặng và rối: do đẩy node_modules/, dist/ (trung bình).
